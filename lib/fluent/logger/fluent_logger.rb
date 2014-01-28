@@ -118,6 +118,39 @@ class FluentLogger < LoggerBase
     write [tag, time.to_i, map]
   end
 
+  def batch_post_with_time(messages)
+    # convert each message
+    # batch send
+    # if batch > byte max, send in multiple requests
+    #
+    # how to handle errors? immediate fail batch, or skip bad messageS?
+
+    # what if pending is not null here? if we check needs to be syncronized
+
+    # Reorder since #post_with_time takes a different order than #write
+    # NOTE Should we mangle the time? It should be .to_i here
+    payloads = messages.map do |msg| 
+      proper = msg.values_at(0, 2, 1)
+      proper[1] = proper[1].to_i unless proper[1].is_a?(Fixnum) # Convert time
+      prepare_msg proper
+    end
+
+    # Check for 'false' payloads, those are errors, and last message will be set.
+
+    payload = ""
+
+    payloads.each do |data|
+      if payload.bytesize + data.bytesize > @limit
+        raw_write payload
+        payload = ""
+      end
+
+      payload << data
+    end
+
+    raw_write payload if payload.bytesize > 0
+  end
+
   def close
     @mon.synchronize {
       if @pending
@@ -161,14 +194,24 @@ class FluentLogger < LoggerBase
   end
 
   def write(msg)
+    data = prepare_msg(msg)
+
+    return false if data === false
+
+    raw_write data
+  end
+
+  def prepare_msg(msg)
     begin
-      data = to_msgpack(msg)
+      to_msgpack(msg)
     rescue => e
       set_last_error(e)
       @logger.error("FluentLogger: Can't convert to msgpack: #{msg.inspect}: #{$!}")
       return false
     end
+  end
 
+  def raw_write(data)
     @mon.synchronize {
       if @pending
         @pending << data

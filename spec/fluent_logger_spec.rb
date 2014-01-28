@@ -60,6 +60,14 @@ describe Fluent::Logger::FluentLogger do
     queue
   }
 
+  let(:queue_with_time) {
+    queue = []
+    output.emits.each {|tag, time, record|
+      queue << [tag, time, record]
+    }
+    queue
+  }
+
   after(:each) do
     output.emits.clear rescue nil
   end
@@ -160,6 +168,49 @@ EOF
         queue.last.should be_nil
         logger_io.rewind
         logger_io.read =~ /FluentLogger: Can't convert to msgpack:/
+      }
+
+      it ('batch post') {
+        messages = [
+          ['logger-test.tag1', 'message 1', Time.utc(2008, 9, 1, 10, 5, 0)],
+          ['logger-test.tag2', 'message 2', Time.utc(2008, 9, 1, 10, 6, 0)],
+        ]
+
+        logger.batch_post_with_time(messages)
+        wait_transfer
+
+        queue_with_time.should have(2).items
+        queue_with_time.first[0].should eq('logger-test.tag1')
+        queue_with_time.first[1].should eq(1220263500)
+        queue_with_time.first[2].should eq('message 1')
+        queue_with_time.last[0].should eq('logger-test.tag2')
+        queue_with_time.last[1].should eq(1220263560)
+        queue_with_time.last[2].should eq('message 2')
+      }
+
+      it ('batches faster than single') {
+        require 'benchmark'
+        require 'digest/md5'
+
+        messages = 1000.times.map do |id|
+          ['logger-test.tag', Digest::MD5.hexdigest(id.to_s), Time.now]
+        end
+
+        single = Benchmark.realtime do
+          output.emits.clear
+          messages.each {|m| logger.post_with_time *m }
+          wait_transfer
+          queue.should have(1000).items
+        end
+
+        batch = Benchmark.realtime do
+          output.emits.clear
+          logger.batch_post_with_time messages
+          wait_transfer
+          queue.should have(1000).items
+        end
+
+        batch.should be < single
       }
 
       it ('should raise an error when second argument is non hash object') {
