@@ -24,11 +24,11 @@ EOF
   gem.name        = %q{jmoses_fluent-logger}
   gem.version     = version
   # gem.platform  = Gem::Platform::RUBY
-  gem.authors     = ["Sadayuki Furuhashi", "Jon Moses"]
-  gem.email       = %q{frsyuki@gmail.com jon@burningbush.us}
+  gem.authors     = ["Jon Moses", "Sadayuki Furuhashi"]
+  gem.email       = %q{jon@burningbush.us frsyuki@gmail.com}
   gem.homepage    = %q{https://github.com/jmoses/fluent-logger-ruby}
   gem.description = %q{fluent logger for ruby}
-  gem.summary     = gem.description
+  gem.summary     = gem.description + " (fork by jmoses)"
 
   gem.files         = `git ls-files`.split("\n")
   gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
