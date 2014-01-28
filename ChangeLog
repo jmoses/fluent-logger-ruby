@@ -1,3 +1,11 @@
+Release jmoses_0.4.8 - 2014/01/28
+
+Note that you probably do *not* want this version, but the official version
+instead.
+
+* Support for batch posting events in a single connection attempt
+(semi-tested)
+
 Release 0.4.7 - 2013/11/21
 
   * Suppress log error message with :log_reconnect_error_threshold option
