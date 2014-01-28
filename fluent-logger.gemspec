@@ -21,12 +21,12 @@ EOF
     system("git submodule update -i")
   end
 
-  gem.name        = %q{fluent-logger}
+  gem.name        = %q{jmoses_fluent-logger}
   gem.version     = version
   # gem.platform  = Gem::Platform::RUBY
-  gem.authors     = ["Sadayuki Furuhashi"]
-  gem.email       = %q{frsyuki@gmail.com}
-  gem.homepage    = %q{https://github.com/fluent/fluent-logger-ruby}
+  gem.authors     = ["Sadayuki Furuhashi", "Jon Moses"]
+  gem.email       = %q{frsyuki@gmail.com jon@burningbush.us}
+  gem.homepage    = %q{https://github.com/jmoses/fluent-logger-ruby}
   gem.description = %q{fluent logger for ruby}
   gem.summary     = gem.description
 
