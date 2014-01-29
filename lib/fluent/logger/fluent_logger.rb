@@ -114,8 +114,7 @@ class FluentLogger < LoggerBase
 
   def post_with_time(tag, map, time)
     @logger.debug { "event: #{tag} #{map.to_json}" rescue nil }
-    tag = "#{@tag_prefix}.#{tag}" if @tag_prefix
-    write [tag, time.to_i, map]
+    write prepare_post_with_time_arguments(tag, map, time)
   end
 
   def batch_post_with_time(messages)
@@ -130,9 +129,7 @@ class FluentLogger < LoggerBase
     # Reorder since #post_with_time takes a different order than #write
     # NOTE Should we mangle the time? It should be .to_i here
     payloads = messages.map do |msg| 
-      proper = msg.values_at(0, 2, 1)
-      proper[1] = proper[1].to_i unless proper[1].is_a?(Fixnum) # Convert time
-      prepare_msg proper
+      prepare_msg prepare_post_with_time_arguments(*msg)
     end
 
     # Check for 'false' payloads, those are errors, and last message will be set.
@@ -183,6 +180,12 @@ class FluentLogger < LoggerBase
     rescue NoMethodError
       Yajl::Parser.parse( Yajl::Encoder.encode(msg) ).to_msgpack
     end
+  end
+
+  def prepare_post_with_time_arguments(tag, map, time)
+    tag = "#{@tag_prefix}.#{tag}" if @tag_prefix
+
+    [tag, time.to_i, map]
   end
 
   def suppress_sec

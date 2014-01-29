@@ -172,8 +172,8 @@ EOF
 
       it ('batch post') {
         messages = [
-          ['logger-test.tag1', 'message 1', Time.utc(2008, 9, 1, 10, 5, 0)],
-          ['logger-test.tag2', 'message 2', Time.utc(2008, 9, 1, 10, 6, 0)],
+          ['tag1', 'message 1', Time.utc(2008, 9, 1, 10, 5, 0)],
+          ['tag2', 'message 2', Time.utc(2008, 9, 1, 10, 6, 0)],
         ]
 
         logger.batch_post_with_time(messages)
@@ -193,7 +193,7 @@ EOF
         require 'digest/md5'
 
         messages = 1000.times.map do |id|
-          ['logger-test.tag', Digest::MD5.hexdigest(id.to_s), Time.now]
+          ['tag', Digest::MD5.hexdigest(id.to_s), Time.now]
         end
 
         single = Benchmark.realtime do
