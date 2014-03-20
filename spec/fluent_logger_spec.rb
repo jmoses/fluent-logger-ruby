@@ -170,7 +170,7 @@ EOF
         logger_io.read =~ /FluentLogger: Can't convert to msgpack:/
       }
 
-      it ('batch post') {
+      it ('batch posts') {
         messages = [
           ['tag1', 'message 1', Time.utc(2008, 9, 1, 10, 5, 0)],
           ['tag2', 'message 2', Time.utc(2008, 9, 1, 10, 6, 0)],
@@ -211,6 +211,26 @@ EOF
         end
 
         batch.should be < single
+      }
+
+      it ('batch posts all events when they are larger than the buffer') {
+        messages = [
+          ['tag1', 'message 1', Time.utc(2008, 9, 1, 10, 5, 0)],
+          ['tag2', 'message 2', Time.utc(2008, 9, 1, 10, 6, 0)],
+        ]
+
+        logger.limit = 50
+
+        logger.batch_post_with_time(messages)
+        wait_transfer
+
+        queue_with_time.should have(2).items
+        queue_with_time.first[0].should eq('logger-test.tag1')
+        queue_with_time.first[1].should eq(1220263500)
+        queue_with_time.first[2].should eq('message 1')
+        queue_with_time.last[0].should eq('logger-test.tag2')
+        queue_with_time.last[1].should eq(1220263560)
+        queue_with_time.last[2].should eq('message 2')
       }
 
       it ('should raise an error when second argument is non hash object') {

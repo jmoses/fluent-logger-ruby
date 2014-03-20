@@ -137,7 +137,7 @@ class FluentLogger < LoggerBase
     payload = ""
 
     payloads.each do |data|
-      if payload.bytesize + data.bytesize > @limit
+      if (payload.bytesize + data.bytesize) > @limit
         raw_write payload
         payload = ""
       end
