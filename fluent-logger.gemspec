@@ -1,28 +1,15 @@
 # encoding: utf-8
 $:.push File.expand_path('../lib', __FILE__)
+require 'fluent/logger/version'
 
 Gem::Specification.new do |gem|
-  version_file = "lib/fluent/logger/version.rb"
-  version = File.read("VERSION").strip
-  File.open(version_file, "w") {|f|
-    f.write <<EOF
-module Fluent
-module Logger
-
-VERSION = '#{version}'
-
-end
-end
-EOF
-  }
-
   unless File.exist?("vendor/fluentd/Gemfile")
     puts "git submodule update -i"
     system("git submodule update -i")
   end
 
   gem.name        = %q{jmoses_fluent-logger}
-  gem.version     = version
+  gem.version     = Fluent::Logger::VERSION
   # gem.platform  = Gem::Platform::RUBY
   gem.authors     = ["Jon Moses", "Sadayuki Furuhashi"]
   gem.email       = %q{jon@burningbush.us frsyuki@gmail.com}
