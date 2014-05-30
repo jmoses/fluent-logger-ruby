@@ -3,10 +3,10 @@ $:.push File.expand_path('../lib', __FILE__)
 require 'fluent/logger/version'
 
 Gem::Specification.new do |gem|
-  unless File.exist?("vendor/fluentd/Gemfile")
-    puts "git submodule update -i"
-    system("git submodule update -i")
-  end
+  #unless File.exist?("vendor/fluentd/Gemfile")
+  #  puts "git submodule update -i"
+  #  system("git submodule update -i")
+  #end
 
   gem.name        = %q{jmoses_fluent-logger}
   gem.version     = Fluent::Logger::VERSION
